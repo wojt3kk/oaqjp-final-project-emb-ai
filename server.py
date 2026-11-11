@@ -9,21 +9,29 @@ app = Flask("Emotion Detector")
 
 @app.route("/emotionDetector")
 def emo_detector():
-    # Retrieve the text to analyze from the request arguments
+    ''' Analyzes the input text for emotions and returns the formatted response.
+    '''
     text_to_analyze = request.args.get('textToAnalyze')
 
-    # Pass the text to the emotion_detector function and store the response
+    # Empty parameter check
+    if not text_to_analyze or not text_to_analyze.strip():
+        return "Invalid text! Please try again!"
+
     response = emotion_detector(text_to_analyze)
 
-    # Extract emotions and dominant emotion from the response
-    anger = response['anger']
-    disgust = response['disgust']
-    fear = response['fear']
-    joy = response['joy']
-    sadness = response['sadness']
-    dominant_emotion = response['dominant_emotion']
+    # Check if the dominant emotion is None (invalid / blank input)
+    if response.get('dominant_emotion') is None:
+        return "Invalid text! Please try again!"
 
-    # Return the formatted response string
+    # Extract emotion values
+    anger = response.get('anger')
+    disgust = response.get('disgust')
+    fear = response.get('fear')
+    joy = response.get('joy')
+    sadness = response.get('sadness')
+    dominant_emotion = response.get('dominant_emotion')
+
+    # Return the required formatted string
     return (
         f"For the given statement, the system response is 'anger': {anger}, "
         f"'disgust': {disgust}, 'fear': {fear}, 'joy': {joy} and 'sadness': {sadness}. "
@@ -32,6 +40,8 @@ def emo_detector():
 
 @app.route("/")
 def render_index_page():
+    ''' Renders the index.html template.
+    '''
     return render_template('index.html')
 
 if __name__ == "__main__":
